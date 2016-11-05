@@ -18,7 +18,7 @@
     }
 
     // Declare a proxy to reference the hub.
-    $.connection.hub.url = "http://localhost:50000/signalr/hubs";
+    $.connection.hub.url = "http://localhost:9999/signalr/hubs";
     var chatHub = $.connection.chatHub;
     registerClientMethods(chatHub);
 
