@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using ChatServer.WebApi.Services;
@@ -12,14 +13,19 @@ namespace ChatServer.WebApi.Hubs
         private readonly ILogger<ChatHub> log;
         private readonly IUserConnectionsRepository userConnectionsRepository;
         private readonly ISupportUsersRegistry supportUsersRegistry;
+        private readonly ISupportRequestRoomsRepository supportRequestRooms;
         private string SupportCommonGroupName = "SupportCommongGroup";
         private string SupportClientsThatNeedHelpGroupName = "SupportClientsThatNeedHelpGroup";
 
-        public ChatHub(ILogger<ChatHub> log, IUserConnectionsRepository userConnectionsRepository, ISupportUsersRegistry supportUsersRegistry)
+        public ChatHub(ILogger<ChatHub> log, 
+            IUserConnectionsRepository userConnectionsRepository, 
+            ISupportUsersRegistry supportUsersRegistry,
+            ISupportRequestRoomsRepository supportRequestRooms)
         {
             this.log = log;
             this.userConnectionsRepository = userConnectionsRepository;
             this.supportUsersRegistry = supportUsersRegistry;
+            this.supportRequestRooms = supportRequestRooms;
             this.log.LogInformation("Created chat hub");
         }
 
@@ -45,15 +51,6 @@ namespace ChatServer.WebApi.Hubs
             return null;
         }
 
-        private async Task SendOnlineUsersToSupportUser()
-        {
-            var users = await GetOnlineUserIds();
-            var supportUsers = await supportUsersRegistry.GetSupportUserIds();
-            var onlineSupportUsers = users.Intersect(supportUsers).ToList();
-
-            Clients.Group(SupportCommonGroupName).setOnlineUsersForSupport(onlineSupportUsers);
-        }
-
         public async override Task OnConnected()
         {
             this.log.LogInformation($"On connected: {Context.ConnectionId} {Context.User.Identity.Name}");
@@ -62,18 +59,64 @@ namespace ChatServer.WebApi.Hubs
                 return;
 
             Clients.Client(Context.ConnectionId).setConnectionId(Context.ConnectionId);
-            await userConnectionsRepository.AddUserConnectionId(userId, Context.ConnectionId);
+            await userConnectionsRepository.AddUserConnectionId(userId, Context.ConnectionId);        
+            await NotifyUserIdHasComeOnline(userId);
+        }
 
+        private async Task NotifyUserIdHasComeOnline(string userId)
+        {
             if (await supportUsersRegistry.IsSupportUser(userId))
             {
                 await Groups.Add(Context.ConnectionId, SupportCommonGroupName);
-                await SendOnlineUsersToSupportUser();
+                await Clients.Group(SupportCommonGroupName).addNewOnlineUser(userId);
             }
         }
 
-        public async Task<List<string>> GetOnlineUserIds()
+        public async Task<string> RequestSupport()
         {
-            return await userConnectionsRepository.GetAllActiveUserIds();
+            var userId = GetUserId();
+            var supportRoom = new UserSupportRoom()
+            {
+                RoomId = Guid.NewGuid().ToString(),
+                RequesterClientUserId = userId,
+                ParticipantUserIds = new List<string>()
+                {
+                    userId
+                }
+            };
+
+            await supportRequestRooms.Add(supportRoom);
+            await Groups.Add(Context.ConnectionId, supportRoom.RoomId);
+
+            await Clients.Group(SupportCommonGroupName).supportRoomCreated(supportRoom);
+            return supportRoom.RoomId;
+        }
+
+        public async Task<List<string>> GetOnlineUsers()
+        {
+            var users = await userConnectionsRepository.GetAllActiveUserIds();
+            var supportUsers = await supportUsersRegistry.GetSupportUserIds();
+            var onlineSupportUsers = users.Intersect(supportUsers).ToList();
+
+            return onlineSupportUsers;
+        }
+
+        public async Task<List<UserSupportRoom>> GetSupportRooms()
+        {
+            return await supportRequestRooms.GetAll();
+        }
+
+        public async Task<bool> ProvideSupport(string roomId)
+        {
+            var userId = GetUserId();
+            var room = await supportRequestRooms.Get(roomId);
+            await Groups.Add(Context.ConnectionId, roomId);
+            room.ParticipantUserIds.Add(userId);
+
+            await supportRequestRooms.Save(room);
+            Clients.Group(roomId).receiveRoomMessage(roomId, "PAPIRI", "Please discuss your issue with support");
+
+            return true;
         }
 
         public async override Task OnDisconnected(bool stopCalled)
@@ -82,9 +125,11 @@ namespace ChatServer.WebApi.Hubs
             var userId = GetUserId();
             if (userId != null)
             {
-                await userConnectionsRepository.RemoveConnectionForUser(userId, Context.ConnectionId);
+                if (await userConnectionsRepository.RemoveConnectionForUser(userId, Context.ConnectionId))
+                {
+                    await Clients.Group(SupportCommonGroupName).userDisconnected(userId);
+                }
             }
-            await SendOnlineUsersToSupportUser();
 
             await base.OnDisconnected(stopCalled);
         }
@@ -98,9 +143,27 @@ namespace ChatServer.WebApi.Hubs
                 return;
 
             await userConnectionsRepository.AddUserConnectionId(userId, Context.ConnectionId);
-            await SendOnlineUsersToSupportUser();
+            await NotifyUserIdHasComeOnline(userId);
 
             await base.OnReconnected();
         }
+    }
+
+    public class UserSupportRoom
+    {
+        public string RoomId { get; set; }
+
+        public string RequesterClientUserId { get; set; }
+
+        public List<string> ParticipantUserIds { get; set; }
+    }
+
+
+
+    public class SupportContext    
+    {
+        public List<string> SupportUsers { get; set; }
+
+        public List<UserSupportRoom> SupportRooms { get; set; }
     }
 }

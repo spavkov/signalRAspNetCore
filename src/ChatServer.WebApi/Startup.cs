@@ -72,7 +72,6 @@ namespace ChatServer.WebApi
 
             services.AddSignalR(options =>
             {
-                //options.EnableJSONP = true;
                 options.Hubs.EnableDetailedErrors = true;
             });
 
@@ -81,6 +80,7 @@ namespace ChatServer.WebApi
             services.AddTransient<ISmsSender, AuthMessageSender>();
             services.AddSingleton<IUserConnectionsRepository, UserConnectionsRepository>();
             services.AddSingleton<ISupportUsersRegistry, SupportUsersRegistry>();
+            services.AddSingleton<ISupportRequestRoomsRepository, SupportRequestRoomsRepository>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

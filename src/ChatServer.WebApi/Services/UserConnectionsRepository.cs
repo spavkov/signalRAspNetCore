@@ -10,7 +10,7 @@ namespace ChatServer.WebApi.Services
     {
         Task AddUserConnectionId(string userId, string connectionId);
         Task<List<string>> GetConnectionIdsForUser(string userId);
-        Task RemoveConnectionForUser(string userId, string connectionId);
+        Task<bool> RemoveConnectionForUser(string userId, string connectionId);
         Task<List<string>> GetAllActiveUserIds();
     }
 
@@ -58,7 +58,7 @@ namespace ChatServer.WebApi.Services
             return Task.FromResult(userConnections.Keys.Distinct().ToList());
         }
 
-        public Task RemoveConnectionForUser(string userId, string connectionId)
+        public Task<bool> RemoveConnectionForUser(string userId, string connectionId)
         {
             List<UserConnection> conns;
             userConnections.TryGetValue(userId, out conns);
@@ -81,9 +81,10 @@ namespace ChatServer.WebApi.Services
             {
                 List<UserConnection> result;
                 userConnections.TryRemove(userId, out result);
+                return Task.FromResult(true);
             }
 
-            return Task.FromResult(true);
+            return Task.FromResult(false);
         }
     }
 
