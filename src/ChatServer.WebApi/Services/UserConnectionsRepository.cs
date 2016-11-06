@@ -9,9 +9,9 @@ namespace ChatServer.WebApi.Services
     public interface IUserConnectionsRepository
     {
         Task AddUserConnectionId(string userId, string connectionId);
-        Task<List<UserConnection>> GetConnectionsForUser(string userId);
+        Task<List<string>> GetConnectionIdsForUser(string userId);
         Task RemoveConnectionForUser(string userId, string connectionId);
-        Task<List<string>> GetAllActiveConnections();
+        Task<List<string>> GetAllActiveUserIds();
     }
 
     public class UserConnectionsRepository : IUserConnectionsRepository
@@ -35,22 +35,35 @@ namespace ChatServer.WebApi.Services
             return Task.FromResult(true);
         }
 
-        public Task<List<UserConnection>> GetConnectionsForUser(string userId)
+        public Task<List<string>> GetConnectionIdsForUser(string userId)
         {
             List<UserConnection> conns;
             userConnections.TryGetValue(userId, out conns);
-            return Task.FromResult(conns);
+            return Task.FromResult(conns.Select(a => a.ConnectionId).ToList());
         }
 
-        public Task<List<string>> GetAllActiveConnections()
+        public async Task<List<string>> GetAllConnectionsForSpecificUsers(IEnumerable<string> userIds)
+        {
+            var all = new List<string>();
+            foreach (var userId in userIds)
+            {
+                var current = await GetConnectionIdsForUser(userId);
+                all.AddRange(current);
+            }
+            return all;
+        }
+
+        public Task<List<string>> GetAllActiveUserIds()
         {
             return Task.FromResult(userConnections.Keys.Distinct().ToList());
         }
 
-        public async Task RemoveConnectionForUser(string userId, string connectionId)
+        public Task RemoveConnectionForUser(string userId, string connectionId)
         {
-            var conns = await GetConnectionsForUser(userId);
-            var found = conns?.FirstOrDefault(a => a.ConnectionId == connectionId);
+            List<UserConnection> conns;
+            userConnections.TryGetValue(userId, out conns);
+
+            var found = conns?.FirstOrDefault(a => a.ConnectionId.Equals(connectionId));
             if (found != null)
             {
                 conns.Remove(found);
@@ -69,6 +82,8 @@ namespace ChatServer.WebApi.Services
                 List<UserConnection> result;
                 userConnections.TryRemove(userId, out result);
             }
+
+            return Task.FromResult(true);
         }
     }
 

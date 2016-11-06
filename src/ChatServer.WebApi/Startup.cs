@@ -80,6 +80,7 @@ namespace ChatServer.WebApi
             services.AddTransient<IEmailSender, AuthMessageSender>();
             services.AddTransient<ISmsSender, AuthMessageSender>();
             services.AddSingleton<IUserConnectionsRepository, UserConnectionsRepository>();
+            services.AddSingleton<ISupportUsersRegistry, SupportUsersRegistry>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

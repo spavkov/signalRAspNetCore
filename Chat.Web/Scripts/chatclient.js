@@ -12,14 +12,12 @@
         }
 
         //calls when we have new list of online users
-        chatHub.client.setOnlineUsers = function (users) {
-            console.log("got list of online users " + users);
+        chatHub.client.setOnlineUsersForSupport = function (users) {
+            console.log("got list of online users for support" + users);
         }
 
-        // On New User Connected
-        chatHub.client.onGroupJoined = function (groupName) {
-            console.log("joined group " + groupName);
-        }
+
+
     }
 
     // Declare a proxy to reference the hub.
@@ -38,5 +36,4 @@
         registerEvents(chatHub);
         //chatHub.server.connect("Aaa");
     });
-
 });

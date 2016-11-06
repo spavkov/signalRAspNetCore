@@ -2,6 +2,11 @@
 <html lang="en">
 <head>
     <meta charset="utf-8" />
+    <meta http-equiv="cache-control" content="max-age=0" />
+    <meta http-equiv="cache-control" content="no-cache" />
+    <meta http-equiv="expires" content="0" />
+    <meta http-equiv="expires" content="Tue, 01 Jan 1980 1:00:00 GMT" />
+    <meta http-equiv="pragma" content="no-cache" />
     <title>Welcome to ASP.NET Core</title>
     <style>
         html {
@@ -23,36 +28,35 @@
             padding: 0;
         }
 
-        #header h1 {
-            font-size: 44px;
-            font-weight: normal;
-            margin: 0;
-            padding: 10px 30px 10px 30px;
-        }
+            #header h1 {
+                font-size: 44px;
+                font-weight: normal;
+                margin: 0;
+                padding: 10px 30px 10px 30px;
+            }
 
-        #header span {
-            margin: 0;
-            padding: 0 30px;
-            display: block;
-        }
+            #header span {
+                margin: 0;
+                padding: 0 30px;
+                display: block;
+            }
 
-        #header p {
-            font-size: 20px;
-            color: #fff;
-            background: #007acc;
-            padding: 0 30px;
-            line-height: 50px;
-            margin-top: 25px;
+            #header p {
+                font-size: 20px;
+                color: #fff;
+                background: #007acc;
+                padding: 0 30px;
+                line-height: 50px;
+                margin-top: 25px;
+            }
 
-        }
-
-        #header p a {
-            color: #fff;
-            text-decoration: underline;
-            font-weight: bold;
-            padding-right: 35px;
-            background: no-repeat right bottom url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABcAAAAWCAMAAAAcqPc3AAAANlBMVEUAAAAAeswfitI9mthXp91us+KCvuaTx+mjz+2x1u+83PLH4vTR5/ba7Pjj8Pns9fv1+v3////wy3dWAAAAAXRSTlMAQObYZgAAAHxJREFUeNp9kVcSwCAIRMHUYoH7XzaxOxJ9P8oyQ1uIqNPwh3s2aLmIM2YtqrLcQIeQEylhuCeUOlhgve5yoBCfWmlnlgkN4H8ykbpaE7gR03AbUHiwoOxUH9Xp+ubd41p1HF3mBPrfC87BHeTdaB3ceeKL9HGpcvX9zu6+DdMWT9KQPvYAAAAASUVORK5CYII=);
-        }
+                #header p a {
+                    color: #fff;
+                    text-decoration: underline;
+                    font-weight: bold;
+                    padding-right: 35px;
+                    background: no-repeat right bottom url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABcAAAAWCAMAAAAcqPc3AAAANlBMVEUAAAAAeswfitI9mthXp91us+KCvuaTx+mjz+2x1u+83PLH4vTR5/ba7Pjj8Pns9fv1+v3////wy3dWAAAAAXRSTlMAQObYZgAAAHxJREFUeNp9kVcSwCAIRMHUYoH7XzaxOxJ9P8oyQ1uIqNPwh3s2aLmIM2YtqrLcQIeQEylhuCeUOlhgve5yoBCfWmlnlgkN4H8ykbpaE7gR03AbUHiwoOxUH9Xp+ubd41p1HF3mBPrfC87BHeTdaB3ceeKL9HGpcvX9zu6+DdMWT9KQPvYAAAAASUVORK5CYII=);
+                }
 
         #main {
             padding: 5px 30px;
@@ -65,34 +69,34 @@
             margin: 0 0 0 4%;
         }
 
-        .section h2 {
-            font-size: 13px;
-            text-transform: uppercase;
-            margin: 0;
-            border-bottom: 1px solid silver;
-            padding-bottom: 12px;
-            margin-bottom: 8px;
-        }
+            .section h2 {
+                font-size: 13px;
+                text-transform: uppercase;
+                margin: 0;
+                border-bottom: 1px solid silver;
+                padding-bottom: 12px;
+                margin-bottom: 8px;
+            }
 
-        .section.first {
-            margin-left: 0;
-        }
+            .section.first {
+                margin-left: 0;
+            }
 
-        .section.first h2 {
-            font-size: 24px;
-            text-transform: none;
-            margin-bottom: 25px;
-            border: none;
-        }
+                .section.first h2 {
+                    font-size: 24px;
+                    text-transform: none;
+                    margin-bottom: 25px;
+                    border: none;
+                }
 
-        .section.first li {
-            border-top: 1px solid silver;
-            padding: 8px 0;
-        }
+                .section.first li {
+                    border-top: 1px solid silver;
+                    padding: 8px 0;
+                }
 
-        .section.last {
-            margin-right: 0;
-        }
+            .section.last {
+                margin-right: 0;
+            }
 
         ul {
             list-style: none;
@@ -110,46 +114,41 @@
             text-decoration: none;
         }
 
-        a:hover {
-            text-decoration: underline;
-        }
+            a:hover {
+                text-decoration: underline;
+            }
 
         #footer {
             clear: both;
             padding-top: 50px;
         }
 
-        #footer p {
-            position: absolute;
-            bottom: 10px;
-        }
+            #footer p {
+                position: absolute;
+                bottom: 10px;
+            }
     </style>
-    <script src="Scripts/jquery-1.6.4.min.js"></script>
+    <script src="Scripts/jquery-3.1.1.min.js"></script>
     <script src="Scripts/jquery.signalR-2.2.1.min.js"></script>
 
     <!--Reference the autogenerated SignalR hub script. -->
-    <script src="http://localhost:50000/signalr/hubs"></script>
+
+    <script src="http://localhost:9999/signalr/hubs"></script>
+
+    <script src="Scripts/chatclientsupport.js"></script>
 
 
 </head>
 <body>
 
     <div id="header">
-        <h1>Welcome to ASP.NET Core</h1>
-        <span>
-            We've made some big updates in this release, so it’s <b>important</b> that you spend
-            a few minutes to learn what’s new.
-        </span>
-        <p>You've created a new ASP.NET Core project. <a href="http://go.microsoft.com/fwlink/?LinkId=518016">Learn what's new</a></p>
+        <h1>Papiri SUPPORT Chat</h1>
     </div>
 
     <div id="main">
         <div class="section first">
-            <h2>This application consists of:</h2>
-            <ul>
-                <li>Sample pages using ASP.NET Core MVC</li>
-                <li><a href="http://go.microsoft.com/fwlink/?LinkId=518004">Bower</a> for managing client-side libraries</li>
-                <li>Theming using <a href="http://go.microsoft.com/fwlink/?LinkID=398939">Bootstrap</a></li>
+            <h2>Support Users online:</h2>
+            <ul id="supportUsersOnlineList">
             </ul>
         </div>
         <div class="section">
