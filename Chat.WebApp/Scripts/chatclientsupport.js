@@ -32,8 +32,14 @@
 
     function newSupportRooms(rooms) {
         console.log("new support rooms");
-        rooms.forEach(function(room) {
-            myViewModel.supportRooms.push(room);
+        rooms.forEach(function (room) {
+            var exists = false;
+            myViewModel.supportRooms().forEach(function(sr) {
+                if (sr.RoomId == room.RoomId)
+                    exists = true;
+            });
+            if (!exists)
+                myViewModel.supportRooms.push(room);
         });       
     }
 
@@ -105,7 +111,7 @@
 
     myViewModel.provideSupport = function (room) {
         console.log("providing support for room " + room.RoomId);
-        chatHub.server.provideSupport(room.RoomId);
+        chatHub.server.provideSupport(room.RequesterClientUserId);
     };
 
 });

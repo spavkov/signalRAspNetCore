@@ -75,6 +75,14 @@ namespace ChatServer.WebApi.Hubs
         public async Task<string> RequestSupport()
         {
             var userId = GetUserId();
+
+            UserSupportRoom room;
+            if (await supportRequestRooms.TryGetRoomForUser(userId, out room))
+            {
+                await Groups.Add(Context.ConnectionId, room.RoomId);
+                return room.RoomId;
+            }
+
             var supportRoom = new UserSupportRoom()
             {
                 RoomId = Guid.NewGuid().ToString(),
@@ -106,15 +114,15 @@ namespace ChatServer.WebApi.Hubs
             return await supportRequestRooms.GetAll();
         }
 
-        public async Task<bool> ProvideSupport(string roomId)
+        public async Task<bool> ProvideSupport(string userId)
         {
-            var userId = GetUserId();
-            var room = await supportRequestRooms.Get(roomId);
-            await Groups.Add(Context.ConnectionId, roomId);
-            room.ParticipantUserIds.Add(userId);
+            var providerUserId = GetUserId();
+            var room = await supportRequestRooms.Get(userId);
+            await Groups.Add(Context.ConnectionId, room.RoomId);
+            room.ParticipantUserIds.Add(providerUserId);
 
             await supportRequestRooms.Save(room);
-            Clients.Group(roomId).receiveRoomMessage(roomId, "PAPIRI", "Please discuss your issue with support");
+            Clients.Group(room.RoomId).receiveRoomMessage(room.RoomId, "PAPIRI", "Please discuss your issue with support");
 
             return true;
         }
