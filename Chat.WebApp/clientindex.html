@@ -85,9 +85,9 @@
             </div>
 </div>
 
-<input type="submit" value="Send" style="float: right; " />
+<input type="submit" data-bind="click: sendRoomMessage, enable: canSend" value="Send" style="float: right; " />
 <div style="overflow: hidden; padding-right: .5em;">
-    <input type="text" style="width: 100%;" />
+    <input type="text" data-bind="textInput: currentMessage" style="width: 100%;" />
 </div>
 
 

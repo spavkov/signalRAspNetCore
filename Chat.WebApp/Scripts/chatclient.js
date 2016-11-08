@@ -4,11 +4,11 @@
     var connectionId = "???";
 
     var myViewModel = {
-        messages: ko.observableArray(["a","b"]),
-        chatRoomId: ko.observable()
+        messages: ko.observableArray(),
+        self: this,
+        chatRoomId: ko.observable(""),
+        currentMessage: ko.observable("")
     };
-
-    myViewModel.messages().push("zzz");
 
     function newUsersOnline(onlineUsers) {
         console.log("got list of online users for support");
@@ -49,7 +49,7 @@
 
         chatHub.client.receiveRoomMessage = function(chatRoomId, userId, message) {
             console.log("got room message: [" + chatRoomId + "] " + userId + " : " + message);
-            myViewModel.messages().push("v");
+            myViewModel.messages.push("[" + userId + "] " + message);
         }
 
         //calls when we have new list of online users
@@ -92,8 +92,18 @@
         console.log("requesting support");
         chatHub.server.requestSupport().done(function (chatRoomId) {
             console.log("received support room id " + chatRoomId);
+            myViewModel.chatRoomId(chatRoomId);
         });
     };
 
-    ko.applyBindings(myViewModel);
+    myViewModel.sendRoomMessage = function() {
+        chatHub.server.sendChatRoomMessage(myViewModel.chatRoomId(), myViewModel.currentMessage());
+        myViewModel.currentMessage("");
+    }
+
+    myViewModel.canSend = ko.computed(function() {
+        return myViewModel.chatRoomId() != "" && myViewModel.currentMessage() != "";
+    });
+
+ko.applyBindings(myViewModel);
 });

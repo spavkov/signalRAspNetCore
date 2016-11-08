@@ -168,14 +168,15 @@
 
 </div>
 
-<div style="overflow-y: scroll; height: 400px; width: 100%; clear: both;">
+    <div style="overflow-y: scroll; height: 400px; width: 100%; clear: both;">
 
-</div>
 
-    <input type="submit" value="Send" style="float: right; " />
-    <div style="overflow: hidden; padding-right: .5em;">
-        <input type="text" style="width: 100%;" />
+        <div data-bind="foreach: messages">
+            <p data-bind="text: $data"></p>
+        </div>
     </div>
 
-</body>
-</html>
+    <input type="submit" data-bind="click: sendRoomMessage" value="Send" style="float: right; " />
+    <div style="overflow: hidden; padding-right: .5em;">
+        <input type="text" data-bind="textInput: currentMessage" style="width: 100%;" />
+    </div>

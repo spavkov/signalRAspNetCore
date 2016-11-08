@@ -5,10 +5,11 @@
 
     var myViewModel = {
         onlineSupportUsers: ko.observableArray(),
-        supportRooms: ko.observableArray()
+        supportRooms: ko.observableArray(),
+        chatRoomId: ko.observable(),
+        messages: ko.observableArray(),
+        currentMessage: ko.observable("")
     };
-
-    ko.applyBindings(myViewModel);
 
     function newUsersOnline(onlineUsers) {
         console.log("got list of online users for support");
@@ -65,6 +66,7 @@
 
         chatHub.client.receiveRoomMessage = function (chatRoomId, userId, message) {
             console.log("got room message: [" + chatRoomId + "] " + userId + " : " + message);
+            myViewModel.messages.push("[" + userId + "] " + message);
         }
 
         //calls when we user stopped being reachable
@@ -111,7 +113,14 @@
 
     myViewModel.provideSupport = function (room) {
         console.log("providing support for room " + room.RoomId);
+        myViewModel.chatRoomId(room.RoomId);
         chatHub.server.provideSupport(room.RequesterClientUserId);
     };
 
+    myViewModel.sendRoomMessage = function () {
+        chatHub.server.sendChatRoomMessage(myViewModel.chatRoomId(), myViewModel.currentMessage());
+        myViewModel.currentMessage("");
+    }
+
+    ko.applyBindings(myViewModel);
 });

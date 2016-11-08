@@ -119,10 +119,12 @@ namespace ChatServer.WebApi.Hubs
             var providerUserId = GetUserId();
             var room = await supportRequestRooms.Get(userId);
             await Groups.Add(Context.ConnectionId, room.RoomId);
+            Clients.Group(room.RoomId).receiveRoomMessage(room.RoomId, "PAPIRI", "Support user " + providerUserId + " has joined");
+
             room.ParticipantUserIds.Add(providerUserId);
 
             await supportRequestRooms.Save(room);
-            Clients.Group(room.RoomId).receiveRoomMessage(room.RoomId, "PAPIRI", "Please discuss your issue with support");
+            Clients.Group(room.RoomId).receiveRoomMessage(room.RoomId, "PAPIRI", "Please discuss your issue with support user " + providerUserId);
 
             return true;
         }
@@ -140,6 +142,13 @@ namespace ChatServer.WebApi.Hubs
             }
 
             await base.OnDisconnected(stopCalled);
+        }
+
+        public Task SendChatRoomMessage(string roomId, string message)
+        {
+            var userId = GetUserId();
+            Clients.Group(roomId).receiveRoomMessage(roomId, userId, message);
+            return Task.FromResult(true);
         }
 
         public async override Task OnReconnected()
